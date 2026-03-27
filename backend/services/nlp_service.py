@@ -11,8 +11,8 @@ if api_key:
 
 class NLPService:
     def __init__(self):
-        # Using a fast, lightweight model for tag extraction
-        self.model = genai.GenerativeModel('gemini-1.5-flash') if api_key else None
+        # Using a fast, stable alias for the latest flash model
+        self.model = genai.GenerativeModel('gemini-flash-latest') if api_key else None
 
     def _fallback_extract(self, query):
         print("Falling back to local keyword splitting.")
@@ -21,8 +21,10 @@ class NLPService:
     def extract_tags_from_query(self, query):
         """
         Uses Gemini to extract core concepts, themes, and genres from a query.
-        Falls back to local keyword splitting if API fails or takes > 5s.
+        Falls back to local keyword splitting if API fails or takes > 15s.
         """
+        import time
+        start_time = time.time()
         if not self.model:
             print("WARNING: No Gemini API key found. Set GEMINI_API_KEY in .env.")
             return self._fallback_extract(query)
@@ -51,17 +53,19 @@ class NLPService:
             except Exception as e:
                 result['error'] = str(e)
 
-        # Enforce strict 5 second timeout
+        # Enforce strict 15 second timeout
         thread = threading.Thread(target=api_call)
         thread.start()
-        thread.join(timeout=5.0)
+        thread.join(timeout=15.0)
+
+        elapsed = time.time() - start_time
 
         if thread.is_alive():
-            print("Gemini API request timed out (>5s).")
+            print(f"Gemini API request timed out (>{elapsed:.1f}s). Using fallback.")
             return self._fallback_extract(query)
             
         if 'error' in result:
-            print(f"Gemini API Error: {result['error']}")
+            print(f"Gemini API Error after {elapsed:.1f}s: {result['error']}")
             return self._fallback_extract(query)
             
         try:
@@ -73,6 +77,7 @@ class NLPService:
                 content = content[3:-3].strip()
                 
             tags = json.loads(content)
+            print(f"Gemini success in {elapsed:.1f}s. Extracted: {tags}")
             return [str(t).lower() for t in tags]
             
         except Exception as e:
