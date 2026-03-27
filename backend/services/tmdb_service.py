@@ -1,6 +1,7 @@
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from config import Config
-
 
 class TMDbService:
     """Service for interacting with TMDb API."""
@@ -9,13 +10,27 @@ class TMDbService:
         self.api_key = Config.TMDB_API_KEY
         self.base_url = Config.TMDB_BASE_URL
         self.image_base = Config.TMDB_IMAGE_BASE
+        
+        # [CRITICAL FIX] Implement connection pooling and retries for burst requests
+        self.session = requests.Session()
+        retry_strategy = Retry(
+            total=5,             # Retry up to 5 times
+            backoff_factor=0.5,  # Wait 0.5s, 1s, 2s, 4s between retries
+            status_forcelist=[429, 500, 502, 503, 504], # Retry on rate limits & server errors
+            allowed_methods=["GET"]
+        )
+        # Pool size of 100 ensures we can handle the loop of 40 candidate movies easily
+        adapter = HTTPAdapter(max_retries=retry_strategy, pool_connections=100, pool_maxsize=100)
+        self.session.mount("https://", adapter)
+        self.session.mount("http://", adapter)
 
     def _get(self, endpoint, params=None):
         if params is None:
             params = {}
         params['api_key'] = self.api_key
         try:
-            resp = requests.get(f'{self.base_url}{endpoint}', params=params, timeout=10)
+            # Use self.session instead of requests to utilize connection pooling
+            resp = self.session.get(f'{self.base_url}{endpoint}', params=params, timeout=10)
             resp.raise_for_status()
             return resp.json()
         except requests.RequestException as e:
@@ -70,14 +85,12 @@ class TMDbService:
         return []
 
     def get_onboarding_movies(self):
-        """Get a curated diverse set of popular movies for onboarding."""
         movies = []
-        # Get popular movies from different pages for diversity
         for page in range(1, 4):
             popular = self._get('/movie/popular', {'page': page})
             if popular:
                 movies.extend([self._format_movie(m) for m in popular.get('results', [])[:8]])
-        return movies[:25]  # Return 25 movies
+        return movies[:25] 
 
     def _format_movie(self, movie):
         return {
@@ -113,6 +126,10 @@ class TMDbService:
             'vote_average': movie.get('vote_average', 0),
             'vote_count': movie.get('vote_count', 0),
             'genres': [g.get('name') for g in movie.get('genres', [])],
+            
+            # [CRITICAL FIX] Added genre_ids back in so the ML vectorizer can read it!
+            'genre_ids': [g.get('id') for g in movie.get('genres', [])], 
+            
             'tagline': movie.get('tagline', ''),
             'status': movie.get('status', ''),
             'budget': movie.get('budget', 0),
@@ -122,6 +139,5 @@ class TMDbService:
             'similar': [self._format_movie(m) for m in similar],
             'trailer_key': trailer.get('key') if trailer else None,
         }
-
 
 tmdb_service = TMDbService()

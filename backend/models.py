@@ -17,6 +17,8 @@ class User(db.Model):
     onboarded = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
+    rl_q_table = db.Column(db.JSON, default=dict) 
+
     ratings = db.relationship('Rating', backref='user', lazy='dynamic')
     interactions = db.relationship('Interaction', backref='user', lazy='dynamic')
     reviews = db.relationship('Review', backref='user', lazy='dynamic')
