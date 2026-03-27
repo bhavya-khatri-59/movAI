@@ -1,0 +1,107 @@
+.feed-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: var(--space-2xl);
+  padding: var(--space-xl) 0;
+}
+
+.feed-main h1 {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.feed-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  transition: all var(--transition-smooth);
+}
+.feed-item:hover {
+  transform: translateX(4px);
+}
+
+.feed-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.feed-content {
+  flex: 1;
+}
+.feed-action {
+  font-size: var(--font-small);
+  color: var(--text-secondary);
+}
+.feed-action strong {
+  color: var(--text-primary);
+}
+.feed-time {
+  font-size: var(--font-label);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.feed-emoji {
+  font-size: 1.5rem;
+}
+
+.sidebar-card {
+  padding: var(--space-lg);
+  position: sticky;
+  top: 90px;
+}
+.sidebar-card h3 {
+  font-size: var(--font-body);
+  margin-bottom: var(--space-sm);
+}
+
+.search-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--glass-border);
+}
+.search-user-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+.search-user-item:hover {
+  background: rgba(255,255,255,0.03);
+}
+.search-user-avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--accent-gradient);
+  display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: var(--font-label); flex-shrink: 0;
+}
+.search-user-info { flex: 1; min-width: 0; }
+.search-user-name { font-size: var(--font-small); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.search-user-username { font-size: var(--font-label); color: var(--text-muted); }
+
+@media (max-width: 768px) {
+  .feed-layout {
+    grid-template-columns: 1fr;
+  }
+  .feed-sidebar {
+    display: none;
+  }
+}

@@ -1,0 +1,42 @@
+.home-welcome {
+  padding: var(--space-2xl) 0 var(--space-lg);
+}
+.home-welcome h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.home-welcome p {
+  color: var(--text-secondary);
+  margin-top: var(--space-xs);
+}
+
+.home-section {
+  margin: var(--space-2xl) 0;
+}
+
+.genre-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-md);
+}
+.genre-card {
+  padding: var(--space-xl) var(--space-lg);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.genre-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+.genre-emoji { font-size: 2rem; }
+.genre-name {
+  font-weight: 700;
+  font-size: var(--font-body);
+  color: white;
+}

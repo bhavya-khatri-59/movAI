@@ -1,0 +1,65 @@
+.search-header {
+  padding: var(--space-2xl) 0 var(--space-lg);
+  text-align: center;
+}
+.search-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: var(--space-xl);
+}
+
+.search-bar-large {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.search-icon-lg {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+}
+.search-input-lg {
+  padding: 14px 20px 14px 50px !important;
+  font-size: 1.05rem !important;
+  border-radius: var(--radius-full) !important;
+}
+
+.genre-filter-bar {
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  padding: var(--space-md) 0 var(--space-xl);
+  scrollbar-width: none;
+}
+.genre-filter-bar::-webkit-scrollbar { display: none; }
+
+.search-results {
+  padding-bottom: var(--space-3xl);
+}
+
+/* Discover Page Specific 5-Column Grid */
+.search-results .movie-grid {
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-md);
+}
+
+@media (max-width: 1200px) {
+  .search-results .movie-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .search-results .movie-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .search-results .movie-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+  }
+}
