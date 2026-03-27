@@ -4,7 +4,6 @@ GENRE_MOOD_MAP = {
     'emotional': [18, 10749, 36],     # Drama, Romance, History
     'thriller': [53, 9648, 80],       # Thriller, Mystery, Crime
     'romantic': [10749, 35, 18],      # Romance, Comedy, Drama
-    'relaxing': [99, 16, 10751, 36],  # Documentary, Animation, Family, History
     'action': [28, 12, 878, 10752],   # Action, Adventure, Sci-Fi, War
     'feel-good': [35, 16, 10751, 10402],  # Comedy, Animation, Family, Music
 }
@@ -18,7 +17,7 @@ GENRE_ID_MAP = {
     10770: 'TV Movie', 53: 'Thriller', 10752: 'War', 37: 'Western',
 }
 
-MOODS = ['happy', 'emotional', 'thriller', 'romantic', 'relaxing', 'action', 'feel-good']
+MOODS = ['happy', 'emotional', 'thriller', 'romantic', 'action', 'feel-good']
 
 
 class MoodAnalyzer:
@@ -43,7 +42,6 @@ class MoodAnalyzer:
             {'id': 'emotional', 'label': 'Emotional'},
             {'id': 'thriller', 'label': 'Thriller'},
             {'id': 'romantic', 'label': 'Romantic'},
-            {'id': 'relaxing', 'label': 'Relaxing'},
             {'id': 'action', 'label': 'Action'},
             {'id': 'feel-good', 'label': 'Feel-Good'},
         ]

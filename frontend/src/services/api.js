@@ -59,5 +59,6 @@ export const getMoodMovies = (mood) => api.get('/mood/movies', { params: { mood 
 // Recommendations
 export const getRecommendations = (mood, n = 20) => api.get('/recommendations/', { params: { mood, n } });
 export const getSimilar = (movie_id) => api.get(`/recommendations/similar/${movie_id}`);
+export const getMagicRecommendations = (query, n = 15) => api.get('/recommendations/magic', { params: { query, n } });
 
 export default api;

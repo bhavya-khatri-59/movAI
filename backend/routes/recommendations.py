@@ -35,3 +35,16 @@ def get_similar(movie_id):
     if movie:
         return jsonify({'similar': movie.get('similar', [])})
     return jsonify({'similar': []})
+
+@recommendations_bp.route('/magic', methods=['GET'])
+@jwt_required_custom
+def get_magic_search():
+    """Natural language magic search for movies."""
+    query = request.args.get('query', '')
+    n = request.args.get('n', 15, type=int)
+    
+    if not query:
+        return jsonify({'recommendations': []})
+        
+    movies = recommendation_engine.magic_search(query, n=n)
+    return jsonify({'recommendations': movies, 'query': query})

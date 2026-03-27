@@ -1,0 +1,19 @@
+# Large Datasets
+data/
+*.pkl
+*.tsv
+*.csv
+
+# Python
+backend/__pycache__/
+backend/*.py[cod]
+backend/venv/
+backend/.env
+backend/instance/
+backend/movai.db
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+.DS_Store

@@ -46,6 +46,9 @@ def create_app():
             recommendation_engine.load_movielens(data_path)
         else:
             print(f'MovieLens data not found at {data_path}. Running without offline data.')
+            
+        # Safely load the massive new datasets (Tag Genome / IMDb Ratings)
+        recommendation_engine.load_advanced_datasets()
 
     @app.route('/api/health')
     def health():
