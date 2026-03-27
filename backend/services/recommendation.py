@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 from collections import defaultdict
-from models import User
+from models import db, User
 from services.tmdb_service import tmdb_service
 from services.mood_analyzer import mood_analyzer, GENRE_ID_MAP
 from services.feature_engineering import vectorize_movie, compute_cosine_similarity, TMDB_GENRES
@@ -99,6 +99,52 @@ class RecommendationEngine:
         if not q_values:
             return 0.5
         return sum(q_values) / len(q_values) 
+        
+    # --- [NEW] DYNAMIC METADATA TALLY ---
+    def update_user_metadata_tally(self, user_id, movie_id, reward):
+        """Maintains a rolling scoreboard of the user's favorite actors and directors."""
+        user = User.query.get(user_id)
+        if not user: return
+
+        # We need the full cast list for this movie
+        movie = tmdb_service.get_movie(movie_id)
+        if not movie: return
+
+        # Force a copy so SQLAlchemy detects the JSON change
+        prefs = dict(user.preferences) if user.preferences else {}
+        actor_tally = prefs.get('actor_tally', {})
+        director_tally = prefs.get('director_tally', {})
+
+        # Add reward to the Top 5 billed actors in the movie
+        for actor in movie.get('cast', [])[:5]:
+            name = actor.get('name')
+            if name:
+                actor_tally[name] = actor_tally.get(name, 0.0) + reward
+
+        # Add reward to the director
+        director = movie.get('director', {})
+        if director and director.get('name'):
+            d_name = director.get('name')
+            director_tally[d_name] = director_tally.get(d_name, 0.0) + reward
+
+        # Sort and extract the absolute Top 10 Actors and Top 3 Directors
+        top_actors = sorted(actor_tally.items(), key=lambda x: x[1], reverse=True)[:10]
+        top_directors = sorted(director_tally.items(), key=lambda x: x[1], reverse=True)[:3]
+
+        # Save back to preferences
+        prefs['actor_tally'] = actor_tally
+        prefs['director_tally'] = director_tally
+        prefs['favorite_actors'] = [a[0] for a in top_actors]
+        prefs['favorite_directors'] = [d[0] for d in top_directors]
+
+        user.preferences = prefs
+        db.session.commit()
+
+    def update_rl(self, user_id, movie_id, reward):
+        """Proxy method to update the RL agent AND our dynamic metadata tallies."""
+        rl_agent.update_q_value(user_id, movie_id, reward)
+        # Hook into the existing update cycle to calculate top actors!
+        self.update_user_metadata_tally(user_id, movie_id, reward)
 
     def recommend(self, user_id, mood=None, n=20, exclude_ids=None):
         if exclude_ids is None: exclude_ids = set()
@@ -124,15 +170,11 @@ class RecommendationEngine:
                 seen.add(m['id'])
                 unique_candidates.append(m)
 
-        # [NEW] Slice down to Top 5 so we don't overwhelm the TMDB API
-        unique_candidates = unique_candidates[:5]
+        unique_candidates = unique_candidates[:15]
 
         scored = []
         for base_movie in unique_candidates:
-            # [NEW] Fetch the FULL profile to get Cast/Crew
             full_movie = tmdb_service.get_movie(base_movie['id'])
-            
-            # Fallback if API fails
             movie_to_score = full_movie if full_movie else base_movie 
 
             content_score = self.content_based_score(user_id, movie_to_score)
