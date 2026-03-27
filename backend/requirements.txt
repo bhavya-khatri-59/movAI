@@ -8,3 +8,4 @@ python-dotenv==1.0.1
 numpy==1.26.4
 pandas==2.2.3
 scikit-learn==1.6.1
+google-generativeai==0.8.4
